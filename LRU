@@ -1,0 +1,38 @@
+class LRU:
+    def __init__(self, n : int):
+        self.size = n
+        self.cache = []
+        self.mapCache = {}
+    
+    def get(self, key):
+        if key not in self.mapCache.keys():
+            return False
+        self.cache.remove(key)
+        self.cache.append(key)
+        return True
+        
+    def addToCache(self, key):
+        if self.size == len(self.cache):
+            first_key = self.cache.pop(0)
+            del self.mapCache[first_key]
+        self.cache.append(key)
+        self.mapCache[key] = len(self.cache)-1
+    
+    def refer(self, key):
+        if self.get(key):
+            return
+        self.addToCache(key)
+        
+    def display(self):
+        print(self.cache[::-1])
+        # for i in range(len(self.cache)-1, -1, -1):
+        #     print(self.cache[i], end = " ")
+          
+# if __name__ == '__main__':
+# cache = LRU(3)
+# cache.refer(1)
+# cache.refer(2)
+# cache.refer(3)
+# cache.refer(4)
+# cache.refer(2)
+# cache.display()
