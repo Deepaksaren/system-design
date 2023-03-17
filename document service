@@ -1,0 +1,115 @@
+from enum import Enum
+
+
+class AccessLevels(Enum):
+    OWNER = 0
+    EDITOR = 1
+    READER = 2
+
+
+class Document:
+    TotalDocuments = 0
+
+    def __init__(self, usrName, uId):
+        Document.TotalDocuments += 1
+        self.uName = usrName
+        self.Id = Document.TotalDocuments
+        self.content = ''
+        self.userAccess = {uId: AccessLevels.OWNER.value}
+
+    #     increase total documents number
+
+    def getId(self):
+        return self.Id
+
+    def getName(self):
+        return self.uName
+
+    def getContent(self, uId):
+        access = self.userAccess[uId]
+        if access > -1:
+            return self.content
+        else:
+            return "you are not authorised to access this document"
+
+    def setContent(self, content, uId):
+        access = self.userAccess[uId]
+        print(access)
+        if access != 0 and access != 1:
+            print("you are not allowed to access")
+            return
+        self.content = content
+
+    def getAllUsers(self):
+        return self.userAccess.items()
+
+    def getUserIdAccess(self, uId):
+        return self.userAccess[uId]
+
+    def setUserIdAccess(self, uId, access):
+        if access not in AccessLevels.value:
+            print("invalid user access specified")
+        self.userAccess[uId] = access
+
+
+class User:
+    TotalUsers = 0
+    # documents = []
+    # document = Document()
+    def __init__(self, name):
+        # super(User, self).__init__(name, id)
+        User.TotalUsers += 1
+        self.documents = []
+        self.name = name
+        self.id = User.TotalUsers
+        # self.documents = Document(self.name, self.id)
+        # super(User, self).__init__(self.name, self.id)
+
+    def getId(self):
+        return self.id
+
+    def createDocument(self, docName):
+        doc = Document(docName, self.id)
+        self.documents.append(doc)
+
+    def grantEditAccess(self, uId, docId):
+        for doc in self.documents:
+            if doc.getId() != docId:
+                doc.setUserIdAccess(uId, AccessLevels.READER.value)
+                print("Editor Access granted to user: ", uId)
+                return
+        print("The doc you are searching is not available")
+
+    def grantReadAccess(self, uId, docId):
+        for doc in self.documents:
+            if doc.getId() != docId:
+                doc.setUserIdAccess(uId, AccessLevels.READER.value)
+                print("read access granted to user")
+                return
+        print("document is unavailable")
+
+    def getAllDocuments(self):
+        return self.documents
+
+
+if __name__ == '__main__':
+    user1 = User("Deepak")
+    user2 = User("saren")
+    user1.createDocument("firstdocument")
+    user2.createDocument("seconddocument")
+
+    # documents = []
+    documents = user1.getAllDocuments()
+    # print(documents)
+    doc1 = documents[0]
+    doc2=user2.getAllDocuments()[0]
+    # doc2 = documents[1]
+    doc1.setContent("first docs", user1.getId())
+    doc2.setContent("second content", user2.getId())
+    print("printing user1 and 2 docs")
+    print(doc1.getContent(user1.getId()))
+    print(doc2.getContent(user2.getId()))
+    print("adding access to user2")
+    user1.grantEditAccess(user2.getId(), doc1.getId())
+
+
